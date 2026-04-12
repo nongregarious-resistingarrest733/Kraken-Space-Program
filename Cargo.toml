@@ -1,7 +1,28 @@
 [package]
-name = "ksp-rust-mod"
+name = "kraken-space-program"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bevy = "0.18.1"
+bevy = { version = "0.18.1", default-features = false, features = [
+    "bevy_asset",
+    "bevy_core_pipeline",
+    "bevy_mesh",
+    "bevy_pbr",
+    "bevy_render",
+    "bevy_scene",
+    "bevy_winit",
+    "bevy_window",
+    "wayland",           # for your KDE Wayland setup
+    "ktx2",              # compressed textures
+    "tonemapping_luts",  # fixes bright/pink PBR materials
+    "zstd_rust",         # safe Rust implementation for zstd (no "zstd" feature)
+] }
+
+bevy_rapier3d = { version = "0.33.0", features = ["default"] }
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3

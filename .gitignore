@@ -25,5 +25,8 @@ Managed/
 cleaned/
 KSP-Decompiled/
 
+# Other Folders:
+.vscode/
+
 # Random files
 KSP.sln

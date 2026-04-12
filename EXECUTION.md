@@ -52,21 +52,21 @@ CI runs `fmt`, `clippy`, and `test` on every push. A red CI blocks merging. No e
 These are the things being worked on right now. If you're picking up a task, note it somewhere visible (GitHub issue, Discord, whatever the team is using) so two people don't do the same thing.
 
 ### Foundation
-- [ ] Bevy project skeleton — `main.rs`, `DefaultPlugins`, window opens, nothing crashes
-- [ ] Coordinate system types established:
-  - [ ] `SimPosition(DVec3)` component
-  - [ ] `WorldOrigin` resource (f64)
-  - [ ] `LocalOrigin` resource (f64, near active vessel, render use only)
-  - [ ] `render_sync.rs` stub with the f64→f32 conversion — even if it does nothing yet, the file exists and is the only place this conversion will ever happen
-- [ ] Basic Rapier integration: a sphere with a `RigidBody` falls under a point gravity field
-- [ ] Basic camera: orbits the scene, doesn't clip through origin
-- [ ] CI pipeline: GitHub Actions, runs `cargo fmt --check && cargo clippy -- -D warnings && cargo test`
-- [ ] `CHECKLIST.md` exists and has the "Known Tech Debt" section ready to be filled
+- [x] Bevy project skeleton — `main.rs`, `DefaultPlugins`, window opens, nothing crashes
+- [x] Coordinate system types established:
+  - [x] `SimPosition(DVec3)` component
+  - [x] `WorldOrigin` resource (f64)
+  - [x] `LocalOrigin` resource (f64, near active vessel, render use only)
+  - [x] `render_sync.rs` stub with the f64→f32 conversion — even if it does nothing yet, the file exists and is the only place this conversion will ever happen
+- [x] Basic Rapier integration: a sphere with a `RigidBody` falls under a point gravity field
+- [x] Basic camera: orbits the scene, doesn't clip through origin
+- [x] CI pipeline: GitHub Actions, runs `cargo fmt --check && cargo clippy -- -D warnings && cargo test`
+- [x] `CHECKLIST.md` exists and has the "Known Tech Debt" section ready to be filled
 
-### Not started yet (Phase 0 backlog)
+### (Phase 0 backlog)
 - [ ] wgpu pipeline confirmation — Bevy's default renderer is working, custom wgpu node can be registered (smoke test only, no custom shaders yet)
 - [ ] Rapier fixed timestep confirmed — physics running at 50 Hz, rendering interpolating between ticks
-- [ ] Module directory structure matches DESIGN.md — even if most files are just `mod.rs` stubs
+- [x] Module directory structure matches DESIGN.md — even if most files are just `mod.rs` stubs
 
 ---
 

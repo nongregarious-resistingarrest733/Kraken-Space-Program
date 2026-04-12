@@ -1,6 +1,8 @@
-# Bevy Rapier 3D Reference (bevy_rapier3d)
+# Bevy Rapier Physics Reference (bevy_rapier2d / bevy_rapier3d)
 
-Rapier is the standard physics integration for Bevy. Always use `bevy_rapier3d` for 3D. Always `use bevy_rapier3d::prelude::*;`.
+Rapier is the standard physics integration for Bevy. Use `bevy_rapier3d` for 3D games and `bevy_rapier2d` for 2D games. Always import: `use bevy_rapier3d::prelude::*;` or `use bevy_rapier2d::prelude::*;`.
+
+> **Most of this document covers bevy_rapier3d.** See the [2D Physics](#2d-physics-bevy_rapier2d) section at the bottom for 2D-specific setup and differences.
 
 ---
 
@@ -8,11 +10,11 @@ Rapier is the standard physics integration for Bevy. Always use `bevy_rapier3d` 
 
 ```toml
 [dependencies]
-bevy = "*"
-bevy_rapier3d = "*"
+bevy = "0.18.1"
+bevy_rapier3d = "0.33.0"
 
 # With optional features:
-bevy_rapier3d = { version = "*", features = ["simd-stable", "debug-render-3d"] }
+bevy_rapier3d = { version = "0.33.0", features = ["simd-stable", "debug-render-3d"] }
 ```
 
 **Feature flags:**
@@ -834,4 +836,113 @@ commands.spawn((Collider::ball(0.5), ActiveHooks::MODIFY_SOLVER_CONTACTS));
 ```toml
 [profile.dev.package.bevy_rapier3d]
 opt-level = 3
+```
+
+---
+
+## 2D Physics (bevy_rapier2d)
+
+Most of the 3D documentation applies to 2D with these substitutions.
+
+### Cargo Setup
+
+```toml
+[dependencies]
+bevy_rapier2d = { version = "0.33.0", features = ["debug-render-2d"] }
+
+[profile.dev.package.bevy_rapier2d]
+opt-level = 3
+```
+
+### Plugin Setup
+
+```rust
+use bevy_rapier2d::prelude::*;
+
+App::new()
+    .add_plugins(DefaultPlugins)
+    .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
+    .add_plugins(RapierDebugRenderPlugin::default())
+    .run();
+```
+
+`pixels_per_meter` is important in 2D: Rapier works in SI units (meters) but 2D games use pixels. Without this, gravity (`-9.81 m/s²`) on a 64-pixel character means the character is 64 meters tall — everything falls very slowly. A value of `100.0` means 100 pixels = 1 meter.
+
+### API Differences: 2D vs 3D
+
+| 3D | 2D equivalent |
+|----|--------------|
+| `Vec3` positions | `Vec2` positions |
+| `Collider::cuboid(hx, hy, hz)` | `Collider::cuboid(hx, hy)` |
+| `Collider::capsule_y(hh, r)` | `Collider::capsule_y(hh, r)` (same) |
+| `Collider::halfspace(Vec3::Y)` | `Collider::halfspace(Vec2::Y)` |
+| `Velocity { linvel: Vec3, angvel: Vec3 }` | `Velocity { linvel: Vec2, angvel: f32 }` |
+| `ExternalForce { force: Vec3, torque: Vec3 }` | `ExternalForce { force: Vec2, torque: f32 }` |
+| `LockedAxes::ROTATION_LOCKED_X/Y/Z` | Only `ROTATION_LOCKED` (2D has one rotation axis) |
+| `KinematicCharacterController` translation is `Vec3` | translation is `Vec2` |
+
+### 2D Quickstart
+
+```rust
+fn setup_physics(mut commands: Commands) {
+    // Ground
+    commands.spawn((
+        Collider::cuboid(500.0, 50.0),
+        Transform::from_xyz(0.0, -200.0, 0.0),
+    ));
+
+    // Dynamic ball
+    commands.spawn((
+        RigidBody::Dynamic,
+        Collider::ball(30.0),
+        Restitution::coefficient(0.7),
+        Transform::from_xyz(0.0, 400.0, 0.0),
+    ));
+}
+
+// 2D character controller
+fn setup_player(mut commands: Commands) {
+    commands.spawn((
+        RigidBody::KinematicPositionBased,
+        Collider::capsule_y(20.0, 10.0),
+        KinematicCharacterController::default(),
+        Transform::from_xyz(0.0, 100.0, 0.0),
+    ));
+}
+
+fn move_player(
+    time: Res<Time>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut controllers: Query<&mut KinematicCharacterController>,
+) {
+    for mut controller in &mut controllers {
+        let mut movement = Vec2::ZERO;
+        if keyboard.pressed(KeyCode::ArrowLeft)  { movement.x -= 1.0; }
+        if keyboard.pressed(KeyCode::ArrowRight) { movement.x += 1.0; }
+
+        // Apply gravity manually for kinematic bodies
+        movement.y -= 200.0 * time.delta_secs();
+
+        controller.translation = Some(movement * time.delta_secs());
+    }
+}
+```
+
+### 2D Scene Queries
+
+Same API as 3D — use `ReadRapierContext` — but vectors are `Vec2`:
+
+```rust
+fn cast_ray_2d(rapier_context: ReadRapierContext) {
+    let ctx = rapier_context.single().unwrap();
+    let ray_origin = Vec2::new(0.0, 10.0);
+    let ray_dir = Vec2::new(0.0, -1.0);
+    let max_toi = 100.0;
+    let solid = true;
+
+    if let Some((entity, toi)) = ctx.cast_ray(ray_origin, ray_dir, max_toi, solid, QueryFilter::default()) {
+        let hit = ray_origin + ray_dir * toi;
+        info!("hit {entity:?} at {hit}");
+    }
+}
 ```

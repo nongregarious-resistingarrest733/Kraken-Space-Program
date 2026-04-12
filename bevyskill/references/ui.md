@@ -25,6 +25,62 @@ Node {
 
 ---
 
+## Grid Layout
+
+Bevy UI supports CSS Grid. Set `display: Display::Grid` on the container and use `GridPlacement` on children.
+
+```rust
+// Container
+commands.spawn((
+    Node {
+        display: Display::Grid,
+        // define column widths (repeat 3 equal columns)
+        grid_template_columns: RepeatedGridTrack::flex(3, 1.0),
+        // define row heights
+        grid_template_rows: RepeatedGridTrack::px(2, 64.0),
+        column_gap: Val::Px(8.0),
+        row_gap: Val::Px(8.0),
+        ..default()
+    },
+    BackgroundColor(Color::srgb(0.1, 0.1, 0.1)),
+))
+.with_children(|parent| {
+    for col in 1..=3_i16 {
+        for row in 1..=2_i16 {
+            parent.spawn((
+                Node {
+                    // explicit placement (1-indexed)
+                    grid_column: GridPlacement::start(col),
+                    grid_row: GridPlacement::start(row),
+                    ..default()
+                },
+                BackgroundColor(Color::srgb(0.2, 0.2, 0.5)),
+            ));
+        }
+    }
+});
+```
+
+**GridPlacement builders:**
+
+```rust
+GridPlacement::start(1)         // start at line 1
+GridPlacement::end(3)           // end at line 3
+GridPlacement::start_end(1, 3)  // span lines 1–3
+GridPlacement::span(2)          // span 2 tracks from auto position
+```
+
+**Track sizing:**
+
+```rust
+RepeatedGridTrack::flex(3, 1.0)     // 3 equal flexible columns
+RepeatedGridTrack::px(2, 100.0)     // 2 columns of 100px each
+RepeatedGridTrack::min_content(1)   // shrink to content
+RepeatedGridTrack::auto(4)          // 4 auto-sized tracks
+```
+
+---
+
 ## Styling Components
 
 ```rust
@@ -220,6 +276,101 @@ commands.spawn((
     )],
 ));
 ```
+
+---
+
+## ImageNode (Images in UI)
+
+Use `ImageNode` to display a texture inside a UI `Node`. This replaces the old `UiImage` component.
+
+```rust
+commands.spawn((
+    Node {
+        width: Val::Px(64.0),
+        height: Val::Px(64.0),
+        ..default()
+    },
+    ImageNode::new(asset_server.load("icon.png")),
+));
+
+// With tinting
+ImageNode {
+    image: asset_server.load("icon.png"),
+    color: Color::srgba(1.0, 1.0, 1.0, 0.5),  // 50% opacity
+    ..default()
+}
+
+// With a specific region of a texture atlas
+ImageNode {
+    image: asset_server.load("spritesheet.png"),
+    texture_atlas: Some(TextureAtlas {
+        layout: layout_handle,
+        index: 3,
+    }),
+    ..default()
+}
+```
+
+---
+
+## UI Picking and Interaction
+
+### `Interaction` (built-in, automatic)
+
+Bevy automatically adds the `Interaction` component to `Button` entities. Read it in a system to react to hover and click:
+
+```rust
+fn button_system(
+    mut query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<Button>)>,
+) {
+    for (interaction, mut color) in &mut query {
+        match *interaction {
+            Interaction::Pressed => *color = Color::srgb(0.35, 0.75, 0.35).into(),
+            Interaction::Hovered => *color = Color::srgb(0.25, 0.25, 0.25).into(),
+            Interaction::None    => *color = Color::srgb(0.15, 0.15, 0.15).into(),
+        }
+    }
+}
+```
+
+### Observer-Based Picking (preferred for non-button elements)
+
+Any UI node can have picking observers. This doesn't require the `Button` component:
+
+```rust
+commands.spawn((
+    Node { width: Val::Px(100.0), height: Val::Px(100.0), ..default() },
+    BackgroundColor(Color::srgb(0.2, 0.2, 0.8)),
+))
+.observe(|_: On<Pointer<Click>>| info!("clicked!"))
+.observe(|mut trigger: On<Pointer<Over>>, mut q: Query<&mut BackgroundColor>| {
+    if let Ok(mut bg) = q.get_mut(trigger.entity()) {
+        *bg = Color::srgb(0.4, 0.4, 1.0).into();
+    }
+    trigger.propagate(false);
+})
+.observe(|mut trigger: On<Pointer<Out>>, mut q: Query<&mut BackgroundColor>| {
+    if let Ok(mut bg) = q.get_mut(trigger.entity()) {
+        *bg = Color::srgb(0.2, 0.2, 0.8).into();
+    }
+    trigger.propagate(false);
+});
+```
+
+### `Pickable` (control picking behavior)
+
+```rust
+// Opt out of picking entirely (transparent to pointer events, still blocks lower elements)
+commands.spawn((Node::default(), Pickable::IGNORE));
+
+// Allow events to pass through to elements behind this one
+commands.spawn((Node::default(), Pickable {
+    should_block_lower: false,
+    is_hoverable: true,
+}));
+```
+
+`trigger.propagate(false)` stops an event from bubbling up to parent nodes. Call it in observers when the child handles the event fully.
 
 ---
 

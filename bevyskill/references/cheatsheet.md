@@ -138,6 +138,25 @@ commands.spawn((
     Node { width: Val::Px(200.), height: Val::Px(50.), ..default() },
     BackgroundColor(Color::BLACK),
 ));
+
+// Audio (looping music)
+commands.spawn((
+    AudioPlayer::new(asset_server.load("music.ogg")),
+    PlaybackSettings::LOOP,
+));
+
+// GLTF scene
+commands.spawn(SceneRoot(asset_server.load(
+    GltfAssetLabel::Scene(0).from_asset("models/thing.gltf"),
+)));
+
+// World-space 2D text (not UI)
+commands.spawn((
+    Text2d::new("Label"),
+    TextFont { font_size: 24.0, ..default() },
+    TextColor(Color::WHITE),
+    Transform::from_xyz(0., 1., 0.),
+));
 ```
 
 ---
@@ -266,6 +285,7 @@ pub runtime_handle: SomeHandle,
 | `Color` | `Color::srgb(r,g,b)`, `Color::srgba(r,g,b,a)` |
 | `LinearRgba` | Linear color; used in emissive, shaders |
 | `Val` | `Val::Px(f)`, `Val::Percent(f)`, `Val::Auto`, `Val::Vw(f)`, `Val::Vh(f)` |
+| `px(f)` / `percent(f)` | Shorthand helpers for `Val::Px` / `Val::Percent` |
 | `Timer` | `Timer::from_seconds(t, TimerMode::Repeating)` |
 | `Stopwatch` | Elapsed time; `.tick(delta)`, `.elapsed_secs()` |
 | `Name` | Debug label: `Name::new("Player")` |
@@ -273,8 +293,18 @@ pub runtime_handle: SomeHandle,
 | `Mesh` | Geometry data |
 | `StandardMaterial` | Default PBR material |
 | `AudioSource` | Audio asset |
+| `AudioPlayer` | Component to play audio; pair with `PlaybackSettings` |
+| `AudioSink` | Auto-inserted after playback starts; use to control playback |
 | `Font` | Font asset |
 | `Scene` / `DynamicScene` | Scene assets for serialization |
+| `SceneRoot` | Spawns a scene as children of an entity (replaces `SceneBundle`) |
+| `GltfAssetLabel` | `GltfAssetLabel::Scene(0).from_asset("path.gltf")` |
+| `Text2d` | World-space 2D text component (not UI) |
+| `ZIndex` | Local draw order among siblings in UI hierarchy |
+| `GlobalZIndex` | Global draw order across entire UI tree |
+| `Bloom` | HDR bloom post-processing; requires `Camera { hdr: true, .. }` |
+| `EnvironmentMapLight` | IBL lighting component on Camera3d |
+| `GlobalAmbientLight` | Resource for flat ambient light fill |
 
 ---
 
@@ -300,10 +330,14 @@ commands.spawn((Mesh3d(mesh), MeshMaterial3d(mat)))
 | `SpriteBundle` | `(Sprite, Transform)` tuple |
 | `DirectionalLightBundle` | `(DirectionalLight, Transform)` tuple |
 | `NodeBundle` | `Node` (component only) |
+| `SceneBundle` | `SceneRoot(handle)` |
+| `AudioBundle` | `(AudioPlayer::new(handle), PlaybackSettings::LOOP)` |
+| `TextBundle` | `(Text, TextFont, TextColor, Node)` tuple |
+| `Text2dBundle` | `(Text2d::new("..."), TextFont { .. }, TextColor(..), Transform)` |
 | `time.delta_seconds()` | `time.delta_secs()` |
 | `writer.send(e)` | `writer.write(e)` |
 | `FogSettings` | `DistanceFog` |
 | `Handle<Mesh>` on entity | `Mesh3d(handle)` |
 | `Handle<StandardMaterial>` on entity | `MeshMaterial3d(handle)` |
-| `TextBundle` | `(Text, TextFont, TextColor, Node)` tuple |
 | `despawn_recursive()` on non-children | `despawn()` is fine; `despawn_recursive()` for hierarchies |
+| `Children` / `Parent` traversal | `children_query.iter_descendants(entity)` |

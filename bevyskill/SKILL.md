@@ -22,6 +22,7 @@ Load the appropriate reference before writing non-trivial code:
 | `references/rapier.md` | Physics: rigid bodies, colliders, joints, character controller, scene queries, hooks |
 | `references/errors.md` | All B000x errors with causes and fixes |
 | `references/advanced.md` | Physics interpolation, states, animation, gizmos, scene serialization, asset events |
+| `references/ecosystem.md` | Third-party crates: leafwing-input-manager, lightyear networking |
 
 ---
 
@@ -232,21 +233,107 @@ opt-level = 1
 opt-level = 3
 ```
 
-**Useful feature flags:**
-- `dynamic_linking` — faster incremental compile in dev
-- `bevy_dev_tools` — dev tooling
-- `file_watcher` — hot asset reload
+### Feature Profiles
 
-**Physics (bevy_rapier3d):** See `references/rapier.md`. Add `bevy_rapier3d` to `[dependencies]` and include this or builds will be extremely slow in dev:
+Bevy 0.18 introduces **profiles** — high-level feature groups. Use them with `default-features = false` to compile only what you need, which meaningfully cuts compile times and binary size.
+
+| Profile | What it includes |
+|---------|-----------------|
+| `default` | `2d` + `3d` + `ui` + `audio` (the full experience) |
+| `2d` | Core + 2D rendering + scenes + picking |
+| `3d` | Core + 3D rendering + scenes + picking |
+| `ui` | Core + Bevy UI + scenes + picking |
+
 ```toml
+# 2D-only build — drops all 3D rendering dependencies
+bevy = { version = "0.18.1", default-features = false, features = ["2d"] }
+```
+
+**Real-world minimal 3D example** (no audio, no UI, Wayland, KTX2 textures):
+
+```toml
+[dependencies]
+bevy = { version = "0.18.1", default-features = false, features = [
+    "bevy_asset",
+    "bevy_core_pipeline",
+    "bevy_mesh",
+    "bevy_pbr",
+    "bevy_render",
+    "bevy_scene",
+    "bevy_winit",
+    "bevy_window",
+    "wayland",          # Linux Wayland support
+    "ktx2",             # compressed textures
+    "tonemapping_luts", # fixes bright/pink PBR materials
+    "zstd_rust",        # safe Rust zstd decompression
+] }
+bevy_rapier3d = { version = "0.33.0", features = ["default"] }
+```
+
+> **Note:** If you see pink or overly bright PBR materials, you're missing `tonemapping_luts`. Always include it when using 3D.
+
+### Feature Collections
+
+Between profiles (high-level) and individual features (low-level), 0.18 adds **collections**:
+
+| Collection | Purpose |
+|-----------|---------|
+| `dev` | Hot-reload + debug tools. **Do not ship in release builds.** Enables `file_watcher`, `bevy_dev_tools`, `debug` |
+| `audio` | Core audio support (ogg/vorbis) |
+| `audio-all-formats` | Audio + aac, flac, mp3, mp4, wav |
+| `scene` | Scene serialization/deserialization |
+| `picking` | Pointer events for meshes, sprites, and UI |
+| `default_no_std` | Baseline for `no_std` targets |
+
+### Notable Individual Features (0.18)
+
+| Feature | Notes |
+|---------|-------|
+| `dynamic_linking` | Fastest incremental compile; dev only, do not ship |
+| `file_watcher` | Hot-reload assets from disk (included in `dev` collection) |
+| `bevy_dev_tools` | FPS overlay, diagnostic overlays (included in `dev`) |
+| `hotpatching` | Live-patch Bevy systems without restart — **experimental** |
+| `bevy_solari` | Raytraced direct + indirect lighting — **experimental**, requires RT-capable GPU |
+| `bevy_settings` | Load/save user preferences |
+| `dlss` | NVIDIA DLSS upscaling (requires DLSS SDK) |
+| `track_location` | Source location tracking for change detection; useful for debugging |
+| `meshlet` | Meshlet renderer for dense high-poly scenes — **experimental** |
+| `shader_format_wesl` | WESL shader support (new in 0.18) |
+| `webgpu` | WebGPU in WASM; overrides `webgl2` |
+| `tonemapping_luts` | Required LUTs for tonemapping — if everything is pink, enable this |
+| `smaa_luts` | Required for SMAA anti-aliasing |
+
+### Physics Compile Speeds
+
+```toml
+# bevy_rapier3d = "0.33.0"  (current version for Bevy 0.18.x)
+# Without this, Rapier debug builds are extremely slow
 [profile.dev.package.bevy_rapier3d]
 opt-level = 3
 ```
 
-**Minimal feature build:**
-```toml
-bevy = { version = "0.18.1", default-features = false, features = ["2d"] }
-```
+See `references/rapier.md` for full Rapier setup.
+
+---
+
+## Third-Party Ecosystem
+
+Load `references/ecosystem.md` when the user asks about complex input handling, multiplayer/networking, or any of the libraries below.
+
+| Library | Version (Bevy 0.18) | Purpose |
+|---------|---------------------|---------|
+| `leafwing-input-manager` | `0.20` | Action-based input: keyboard, mouse, gamepad, chords, axes |
+| `lightyear` | latest | Client-server and P2P networking with prediction + interpolation |
+| `bevy_rapier2d` / `bevy_rapier3d` | current | Physics (see `references/rapier.md`) |
+| `avian2d` / `avian3d` | current | Alternative ECS-native physics engine |
+
+**Choosing input:**
+- Builtin `ButtonInput<KeyCode>` / `ButtonInput<MouseButton>` / `Gamepad` — sufficient for simple games
+- `leafwing-input-manager` — use when you need action remapping, chords, analog axes, local multiplayer, or network-serializable inputs
+
+**Choosing physics:**
+- Rapier: mature, battle-tested, C FFI under the hood
+- Avian: pure-Rust, more idiomatic ECS API, still maturing
 
 ---
 

@@ -86,19 +86,32 @@ The open-source mod ecosystem isn't a reference — it's a foundation.
 
 ## Current status
 
-🚧 **Early development — the repo is brand new.**
+🚧 **Early development — Phase 0 mostly complete.**
 
-Right now this is a vision document and a starting point. The first steps are:
+The foundation is real. The architecture is established. A ball falls under gravity and bounces. It's not much to look at yet, but everything underneath it is built to last.
 
-- [ ] Project architecture and repo structure
-- [ ] Basic Bevy scene with orbital mechanics
-- [ ] Lua scripting integration via `mlua`
-- [ ] Networking prototype
-- [ ] First playable prototype
+**Phase 0 — Foundation** *(mostly done)*
+- [x] Bevy project skeleton — window opens, nothing crashes
+- [x] Coordinate system types — `SimPosition` (f64), `WorldOrigin`, `LocalOrigin`, `render_sync.rs` as the single f64→f32 conversion point
+- [x] Rapier physics integration — rigid bodies, fixed 50 Hz timestep, gravity
+- [x] Module directory structure matching the full architecture in `DESIGN.md`
+- [x] CI pipeline — `cargo fmt`, `cargo clippy`, `cargo test` on every push
+- [ ] Physics interpolation — fixed timestep running, render interpolation between ticks pending
+- [ ] wgpu pipeline smoke test
+
+**Phase 1 — A Rocket Goes Up** *(not started)*
+
+Part entities, joints, thrust, drag, staging, Krakensbane origin shifting, camera tracking, crash detection. A hardcoded multi-stage rocket launches, reaches space, and stages. No Lua yet.
+
+The full roadmap lives in [`DESIGN.md`](DESIGN.md). Current tasks and decisions live in [`EXECUTION.md`](EXECUTION.md).
 
 ---
 
 ## Contributing
+
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md) first. It's short.
+
+The quick version: the architecture is in `DESIGN.md`, the current tasks are in `EXECUTION.md`, and `CHECKLIST.md` is where you log tech debt when you cut corners. CI must be green before anything merges.
 
 If you know Rust, Bevy, Lua, orbital mechanics, game networking, 3D art, or you just care about this existing — open an issue, start a discussion, submit a PR.
 
@@ -122,7 +135,7 @@ This software is licensed under the Kraken License v1.0 — Tier 1
 
 Copyright (c) 2026 Seraphina
 
-Full license text: see KRAKEN_LICENSE.md
+Full license text: see [KRAKEN_LICENSE.md](KRAKEN_LICENSE.md)
 
 ---
 

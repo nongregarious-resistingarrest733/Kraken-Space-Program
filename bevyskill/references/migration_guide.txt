@@ -1,0 +1,5 @@
+This file contains many links to migration guides for Bevy, so any AI used to the old syntax can know what NOT to type and what ISN'T in the newest versions anymore:
+
+https://bevy.org/learn/migration-guides/0-17-to-0-18/
+https://bevy.org/learn/migration-guides/0-16-to-0-17/
+https://bevy.org/learn/migration-guides/0-15-to-0-16/

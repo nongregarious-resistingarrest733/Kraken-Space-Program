@@ -190,6 +190,104 @@ fn setup(asset_server: Res<AssetServer>) {
 
 ---
 
+## Audio
+
+Requires the `bevy_audio` feature (enabled by default).
+
+```rust
+// Spawn a looping background track
+fn play_music(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn((
+        AudioPlayer::new(asset_server.load("sounds/music.ogg")),
+        PlaybackSettings::LOOP,
+    ));
+}
+
+// One-shot sound effect
+commands.spawn((
+    AudioPlayer::new(asset_server.load("sounds/hit.ogg")),
+    PlaybackSettings::DESPAWN,  // entity despawns when sound finishes
+));
+```
+
+**`PlaybackSettings` presets:**
+
+| Preset | Behavior |
+|--------|---------|
+| `PlaybackSettings::ONCE` | Play once, entity persists after |
+| `PlaybackSettings::LOOP` | Loop forever |
+| `PlaybackSettings::DESPAWN` | Play once, despawn entity when done |
+| `PlaybackSettings::REMOVE` | Play once, remove `AudioPlayer` when done |
+
+```rust
+// Custom settings
+PlaybackSettings {
+    mode: bevy::audio::PlaybackMode::Loop,
+    volume: Volume::new(0.5),
+    speed: 1.0,
+    paused: false,
+    ..default()
+}
+```
+
+**Controlling playback at runtime** — query the `AudioSink` component, which is inserted automatically once playback starts:
+
+```rust
+fn toggle_pause(sink: Query<&AudioSink, With<MyMusic>>) {
+    if let Ok(sink) = sink.single() {
+        sink.toggle();
+    }
+}
+```
+
+`AudioSink` methods: `.pause()`, `.play()`, `.toggle()`, `.stop()`, `.set_volume(f32)`, `.set_speed(f32)`, `.is_paused() -> bool`.
+
+---
+
+## Scene Loading
+
+`SceneRoot` replaces the old `SceneBundle`. Attach it to an entity to instantiate a scene as children.
+
+```rust
+// Load and spawn a plain Bevy scene
+commands.spawn(SceneRoot(asset_server.load("levels/level1.scn.ron")));
+
+// Load a GLTF scene by index (most common: index 0)
+commands.spawn((
+    SceneRoot(asset_server.load(
+        GltfAssetLabel::Scene(0).from_asset("models/player.gltf"),
+    )),
+    Transform::from_xyz(0.0, 0.0, 0.0),
+));
+
+// Load with named scene label
+asset_server.load("models/player.gltf#Scene0")  // string form also works
+```
+
+**Other `GltfAssetLabel` variants:**
+
+```rust
+GltfAssetLabel::Scene(0)        // scenes
+GltfAssetLabel::Mesh(0)         // raw mesh data
+GltfAssetLabel::Animation(0)    // animation clips
+```
+
+**Reacting when a spawned scene is ready:**
+
+```rust
+fn on_scene_ready(
+    mut events: EventReader<SceneInstanceReady>,
+    children: Query<&Children>,
+) {
+    for event in events.read() {
+        // event.parent — the entity SceneRoot was on
+        for child in children.iter_descendants(event.parent) { }
+    }
+}
+```
+
+---
+
 ## Sprite
 
 ```rust
@@ -202,6 +300,37 @@ Sprite {
     flip_y: bool,
     custom_size: Option<Vec2>,
     ..default()
+}
+
+// Tiling
+Sprite {
+    image: asset_server.load("tile.png"),
+    image_mode: SpriteImageMode::Tiled {
+        tile_x: true,
+        tile_y: true,
+        stretch_value: 1.0,  // 0.5 = tile every half-image-width
+    },
+    ..default()
+}
+```
+
+**Texture atlas (sprite sheets):**
+
+```rust
+// Build atlas layout
+let layout = TextureAtlasLayout::from_grid(UVec2::new(32, 32), 4, 4, None, None);
+let layout_handle = texture_atlas_layouts.add(layout);
+
+commands.spawn((
+    Sprite::from_image(asset_server.load("spritesheet.png")),
+    TextureAtlas { layout: layout_handle, index: 0 },
+));
+
+// Animate by changing index each frame
+fn animate(mut query: Query<&mut TextureAtlas>, time: Res<Time>) {
+    for mut atlas in &mut query {
+        atlas.index = (time.elapsed_secs() * 8.0) as usize % 16;
+    }
 }
 ```
 
@@ -273,6 +402,116 @@ Aabb2d::new(
     transform.scale.truncate() / 2.0,
 )
 ```
+
+---
+
+## Text (World Space — Text2d)
+
+`Text2d` renders text as a 2D entity in the world (not UI). Use it for floating labels, health bars, damage numbers, etc.
+
+```rust
+commands.spawn((
+    Text2d::new("Hello World"),
+    TextFont {
+        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+        font_size: 24.0,
+        ..default()
+    },
+    TextColor(Color::WHITE),
+    Transform::from_xyz(0.0, 1.0, 0.0),
+));
+```
+
+For UI text inside `Node` hierarchies, see `references/ui.md`.
+
+---
+
+## Camera Configuration
+
+```rust
+// 2D camera
+commands.spawn(Camera2d);
+
+// 3D camera
+commands.spawn((
+    Camera3d::default(),
+    Transform::from_xyz(-2.5, 4.5, 9.0).looking_at(Vec3::ZERO, Vec3::Y),
+));
+
+// Custom clear color
+commands.spawn((
+    Camera3d::default(),
+    Camera {
+        clear_color: ClearColorConfig::Custom(Color::BLACK),
+        hdr: true,  // required for Bloom
+        ..default()
+    },
+));
+
+// HDR + Bloom (requires hdr: true on Camera)
+use bevy::post_process::bloom::Bloom;
+commands.spawn((
+    Camera3d::default(),
+    Camera { hdr: true, ..default() },
+    Bloom::default(),
+));
+```
+
+### Environment Lighting
+
+```rust
+// Global ambient light (flat fill, no direction)
+commands.insert_resource(GlobalAmbientLight {
+    brightness: 750.0,
+    ..default()
+});
+
+// Image-based environment map (used with Camera3d)
+use bevy::pbr::EnvironmentMapLight;
+commands.spawn((
+    Camera3d::default(),
+    EnvironmentMapLight {
+        diffuse_map: asset_server.load("env/pisa_diffuse_rgb9e5_zstd.ktx2"),
+        specular_map: asset_server.load("env/pisa_specular_rgb9e5_zstd.ktx2"),
+        intensity: 2_000.0,
+        ..default()
+    },
+));
+```
+
+---
+
+## ZIndex (UI draw order)
+
+Controls draw order among sibling UI nodes. Higher value renders on top.
+
+```rust
+// Local z-order: relative to siblings in same parent
+commands.spawn((Node::default(), ZIndex(2)));
+
+// Global z-order: relative to all UI nodes regardless of hierarchy
+commands.spawn((Node::default(), GlobalZIndex(1)));
+```
+
+`ZIndex` default is `0`. `GlobalZIndex` default is `0`. Negative values render below default. `GlobalZIndex` always beats `ZIndex` across different subtrees.
+
+---
+
+## `children![]` Macro
+
+A convenience macro for declaring static child entities inline. Produces the same result as `.with_children(...)` but reads more declaratively.
+
+```rust
+commands.spawn((
+    Node { width: Val::Percent(100.0), ..default() },
+    children![
+        (Text::new("Left"), TextColor(Color::WHITE)),
+        (Text::new("Right"), TextColor(Color::srgb(1.0, 0.5, 0.0))),
+    ]
+));
+```
+
+Requires `use bevy::prelude::*;` (re-exported from `bevy::ecs`).
 
 ---
 

@@ -602,13 +602,13 @@ Lessons from KSP1's source code, documented so they don't get repeated.
 
 ### Phase 0 — Foundation (current)
 - [ ] Document KSP1 source behavior (ongoing)
-- [ ] Set up Bevy project skeleton
-- [ ] Basic Rapier integration, one rigid body falls under gravity
-- [ ] Basic camera
+- [x] Set up Bevy project skeleton
+- [x] Basic Rapier integration, one rigid body falls under gravity
+- [x] Basic camera
 - [ ] wgpu rendering pipeline confirmed working
-- [ ] CI set up (fmt, clippy, tests must pass to merge)
-- [ ] Coordinate system types established (`SimPosition`, `WorldOrigin`, `LocalOrigin`)
-- [ ] `render_sync.rs` stub exists and is the only f64→f32 conversion point
+- [x] CI set up (fmt, clippy, tests must pass to merge)
+- [x] Coordinate system types established (`SimPosition`, `WorldOrigin`, `LocalOrigin`)
+- [x] `render_sync.rs` stub exists and is the only f64→f32 conversion point
 
 **Exit criteria:** A sphere falls under gravity and renders. CI is green.
 

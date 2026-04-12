@@ -91,20 +91,28 @@ commands.spawn((
 
 ### HDR + Exposure
 
+HDR is a field on the `Camera` struct, not a separate component (the old `Hdr` component was removed in 0.15).
+
 ```rust
-use bevy::render::view::Hdr;
 use bevy::camera::Exposure;
 
 commands.spawn((
     Camera3d::default(),
-    Hdr,
+    Camera {
+        hdr: true,
+        ..default()
+    },
     Exposure { ev100: 13.0 },
     Tonemapping::AcesFitted,
 ));
 
 // WebGL: disable MSAA with HDR
 #[cfg(target_arch = "wasm32")]
-commands.spawn((Camera3d::default(), Hdr, Msaa::Off));
+commands.spawn((
+    Camera3d::default(),
+    Camera { hdr: true, ..default() },
+    Msaa::Off,
+));
 ```
 
 ### Color Grading
@@ -419,10 +427,36 @@ app.add_plugins((
 
 ### Bloom
 
+Bloom requires `hdr: true` on the `Camera` component. Without it the effect silently does nothing.
+
 ```rust
 use bevy::post_process::bloom::Bloom;
-commands.spawn((Camera3d::default(), Bloom::default()));
-commands.spawn((Camera3d::default(), Bloom::NATURAL));
+
+// Minimal bloom setup
+commands.spawn((
+    Camera3d::default(),
+    Camera { hdr: true, ..default() },
+    Bloom::default(),
+));
+
+// Bloom with natural/softer look
+commands.spawn((
+    Camera3d::default(),
+    Camera { hdr: true, ..default() },
+    Tonemapping::TonyMcMapface,
+    Bloom::NATURAL,
+));
+
+// Fine-tuning
+use bevy::post_process::bloom::BloomCompositeMode;
+Bloom {
+    intensity: 0.3,
+    low_frequency_boost: 0.7,
+    high_pass_frequency: 1.0,
+    prefilter: BloomPrefilter { threshold: 1.0, threshold_softness: 0.2 },
+    composite_mode: BloomCompositeMode::EnergyConserving,
+    ..default()
+}
 ```
 
 ### Volumetric Fog
