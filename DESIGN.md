@@ -40,33 +40,33 @@ There are four coordinate spaces in this engine. They are not interchangeable.
 ┌─────────────────────────────────────────────────────────────────┐
 │  SOLAR INERTIAL (f64 DVec3)                                     │
 │  Origin: system barycenter. Axes: J2000-aligned, non-rotating.  │
-│  Used for: orbital elements, SOI calculations, ephemeris.        │
-│  Never used for physics or rendering directly.                   │
+│  Used for: orbital elements, SOI calculations, ephemeris.       │
+│  Never used for physics or rendering directly.                  │
 └─────────────────────────────────────────────────────────────────┘
                           ↓ body frame transform
 ┌─────────────────────────────────────────────────────────────────┐
 │  BODY-FIXED (f64 DVec3)                                         │
 │  Origin: center of a celestial body. Rotates with the body.     │
-│  Used for: surface positions, latitude/longitude/altitude,       │
-│  terrain heightmap sampling, atmosphere lookups.                 │
+│  Used for: surface positions, latitude/longitude/altitude,      │
+│  terrain heightmap sampling, atmosphere lookups.                │
 └─────────────────────────────────────────────────────────────────┘
                           ↓ subtract WorldOrigin
 ┌─────────────────────────────────────────────────────────────────┐
 │  SIMULATION WORLD (f64 DVec3)                                   │
 │  Origin: WorldOrigin resource (tracked in solar inertial f64).  │
-│  Used for: Rapier physics, all vessel positions, joint anchors,  │
-│  collision detection. Krakensbane shifts this when needed.       │
+│  Used for: Rapier physics, all vessel positions, joint anchors, │
+│  collision detection. Krakensbane shifts this when needed.      │
 └─────────────────────────────────────────────────────────────────┘
                           ↓ render_sync.rs ONLY — subtract local origin, cast to f32
 ┌─────────────────────────────────────────────────────────────────┐
 │  RENDER WORLD (f32 Vec3)                                        │
 │  Origin: always near the active vessel. Updated every frame.    │
-│  Used for: Bevy Transform, everything the GPU sees, audio        │
-│  spatialization, UI world-to-screen projection.                  │
+│  Used for: Bevy Transform, everything the GPU sees, audio       │
+│  spatialization, UI world-to-screen projection.                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**The conversion rule is absolute: only `render_sync.rs` crosses the f64→f32 boundary. No other file does this. Ever.**
+**The conversion rule is absolute: only `render_sync.rs` crosses the f64→f32 boundary. No other file is allowed to do this. Ever.**
 
 The cast is safe because the subtraction happens first:
 ```rust
@@ -82,7 +82,7 @@ fn sync_render_transforms(
 }
 ```
 
-If you ever find yourself writing `.as_vec3()` or `as f32` outside of `render_sync.rs`, stop. You're in the wrong place.
+If you ever find yourself writing `.as_vec3()` or `as f32` outside of `render_sync.rs`, stop. That's not allowed. You're in the wrong place.
 
 ### Multiplayer and coordinate spaces
 
@@ -94,7 +94,7 @@ The server works exclusively in Simulation World space (f64). It never does orig
 
 Rapier at a fixed timestep gives deterministic physics. This is necessary for multiplayer and for save/load consistency. There are rules that must never be broken to preserve this.
 
-**Compiler flags:** CI builds and release builds must never enable flags that break IEEE 754 compliance. Fast-math (`-ffast-math` equivalents, or LLVM's `reassociate`/`unsafe-fp-math`) is permanently banned. This is enforced in `.cargo/config.toml` — do not override it per-crate without a reason documented in the PR.
+**Compiler flags:** CI builds and release builds must never enable flags that break IEEE 754 compliance. Fast-math (`-ffast-math` equivalents, or LLVM's `reassociate`/`unsafe-fp-math`) is permanently banned. This is enforced in `.cargo/config.toml`. Do not override it per-crate without a reason documented in the PR.
 
 **FP op ordering:** Even on a single platform (x86-64), different compiler versions can reorder floating point operations in ways that produce different rounding. For anything in `orbital/` or `physics/`, prefer operations with deterministic ordering. If you're not sure, add a unit test with a known numerical result and run it on CI across multiple Rust versions.
 
@@ -391,7 +391,7 @@ Part {
   
   modules = {
     Engine {
-      thrust      = 20,    -- kN, sea level
+      thrust      = 20,    -- kN, vacuum
       isp_vac     = 320,   -- s
       isp_sl      = 265,   -- s
       propellants = { LiquidFuel = 0.9, Oxidizer = 1.1 },
@@ -488,7 +488,7 @@ Colliders are generated only for LOD 4 chunks, also async. A vessel cannot land 
 
 ### Procedural heightmap
 
-Noise parameters defined in Lua per body. The terrain system exposes a Lua API for composing noise layers (simplex, ridged, domain-warped, etc.). Kerbin is defined in Lua — not hardcoded in Rust.
+Noise parameters defined in Lua per body. The terrain system exposes a Lua API for composing noise layers (simplex, ridged, domain-warped, etc.). Planets are to be defined in Lua, not hardcoded in Rust.
 
 ---
 
@@ -509,7 +509,7 @@ Atmosphere {
 }
 ```
 
-Aerodynamic drag is computed per-part: cross-sectional area × drag coefficient × dynamic pressure. Not CFD. KSP1's drag model is acceptable reference behavior — feel the same, be more stable, be cheaper to compute.
+Aerodynamic drag is computed per-part: cross-sectional area × drag coefficient × dynamic pressure, not CFD. KSP1's drag model is acceptable reference behavior;  drag in KrakenSP should feel similar, but be more stable and cheaper to compute.
 
 The drag computation reads `DragSurface` components and writes to `PendingForces`. The aerodynamics system and the physics system are decoupled by this component.
 
@@ -541,7 +541,7 @@ A save file contains:
 **Vessel part trees serialize as a flat list of parts with parent IDs, not a recursive structure.** Flat lists diff cleanly and avoid stack overflows on huge vessels.
 
 ```toml
-[[vessels]]
+[[vessel]]
 id   = "vessel-uuid-here"
 name = "Kraken I"
 root_part = "part-0"
@@ -556,7 +556,7 @@ rotation    = [0.0, 0.0, 0.0, 1.0]
 
 [[vessels.parts]]
 id          = "part-1"
-part_id     = "kraken.tank.small"
+part_id     = "kraken.tank.small.shortest"
 parent      = "part-0"
 attach_node = "top"
 resources   = { LiquidFuel = 45.0, Oxidizer = 55.0 }
@@ -564,7 +564,7 @@ resources   = { LiquidFuel = 45.0, Oxidizer = 55.0 }
 
 **Versioning:** Save files include the SDK version. Loading an old save runs a migration chain. Migration functions live in `src/save/migrations/`. There must be a migration function for every version increment — no skipping.
 
-**Unknown parts:** If a part ID no longer exists (mod removed), the part loads as an `UnknownPart` placeholder entity rather than crashing. The player is notified. The vessel loads intact minus the missing part.
+**Unknown parts:** If a part ID no longer exists (mod removed), the part loads as an `UnknownPart` placeholder entity rather than crashing. The player is notified. The vessel loads intact minus the missing part and its subtrees (if any).
 
 ---
 
@@ -625,6 +625,7 @@ Lessons from KSP1's source code, documented so they don't get repeated.
 - [ ] Camera follows active vessel
 - [ ] Basic placeholder UI (altitude, velocity, throttle)
 - [ ] Crash detection (impact velocity → part destruction events)
+- [ ] Basic resource flow system (parts consume and generate resources per crossfeed rules)
 
 **Exit criteria:** A hardcoded multi-stage rocket can launch, reach space, and stage. No f32 precision artifacts visible.
 
@@ -652,14 +653,15 @@ Lessons from KSP1's source code, documented so they don't get repeated.
 - [ ] Atmosphere scattering shader (simple Rayleigh)
 - [ ] Basic map view (2D orbital view)
 
-**Exit criteria:** A vessel can launch from Kerbin, reach Mun, land, and come back.
+**Exit criteria:** A vessel can launch from the starting celestial body, reach its satellite, land, and come back.
 
 ### Phase 4 — The Game
 - [ ] Career mode scaffolding (Lua-driven)
+- [ ] Part balancing
 - [ ] Science system (Lua-driven)
-- [ ] Kerbal EVA
+- [ ] Crew EVA
 - [ ] Docking
-- [ ] Resource flow system (fuel lines, crossfeed rules)
+- [ ] Advanced resource flow system (fuel lines, customizable crossfeed rules)
 - [ ] Save/load (TOML, migration chain, unknown part handling)
 - [ ] Settings and input binding
 - [ ] VAB/SPH equivalent editor
