@@ -18,6 +18,8 @@ KSP2 promised to fix all of that. It didn't. It's dead now.
 
 So we're doing it ourselves.
 
+![ezgif-7da0d66b26a8cfd9](https://github.com/user-attachments/assets/9fc8532a-c9d7-48d5-9fc7-6d78a3af7680)
+
 ---
 
 ## What is this, exactly?
