@@ -20,15 +20,5 @@ target
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# KSP Folders
-Managed/
-cleaned/
-KSP-Decompiled/
-bevyskill/
-
 # Other Folders:
 .vscode/
-
-# Random files
-KSP.sln
-codecount.sh
