@@ -131,11 +131,7 @@ The name "KSP" is not owned by anyone. The Kraken is public domain. Space is fre
 
 ## License
 
-This software is licensed under the Kraken License v1.0 — Tier 1
-
-Copyright (c) 2026 Seraphina
-
-Full license text: see [KRAKEN_LICENSE.md](KRAKEN_LICENSE.md)
+This software is licensed under the MIT License
 
 ---
 

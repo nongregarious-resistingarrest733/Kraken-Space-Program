@@ -24,9 +24,11 @@ target
 Managed/
 cleaned/
 KSP-Decompiled/
+bevyskill/
 
 # Other Folders:
 .vscode/
 
 # Random files
 KSP.sln
+codecount.sh

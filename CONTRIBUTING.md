@@ -123,6 +123,4 @@ If you think you found a bug that is actually the Kraken, you did not find a bug
 
 ## License
 
-By contributing, you agree that your contributions are licensed under the Kraken License v1.0 — Tier 1. See `KRAKEN_LICENSE.md` for the full text.
-
-The short version: you keep the copyright on what you write. You grant the project a perpetual license to use it. The ethical conditions in Section 4 of the license apply. No one can patent-troll the project using your contributions.
+By contributing, you agree that your contributions are licensed under the MIT License
