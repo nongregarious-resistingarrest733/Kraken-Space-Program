@@ -372,7 +372,7 @@ Any PR that changes a Lua-visible API surface must include a migration note in t
 ### Part definition example (what a modder writes)
 
 ```lua
-Part {
+part {
   id = "kraken.engine.spark",
   display_name = "Spark Engine",
   
@@ -390,11 +390,11 @@ Part {
   },
   
   modules = {
-    Engine {
+    engine {
       thrust      = 20,    -- kN, vacuum
       isp_vac     = 320,   -- s
       isp_sl      = 265,   -- s
-      propellants = { LiquidFuel = 0.9, Oxidizer = 1.1 },
+      propellants = { RP1 = 0.3, LOX = 0.7 },
     },
   },
 }
@@ -577,6 +577,10 @@ Lessons from KSP1's source code, documented so they don't get repeated.
 **No empty virtual methods.** KSP1 has ~50 lifecycle methods defined as empty virtuals on the base Part class, most of which are never overridden. In Bevy, lifecycle hooks are events. Systems subscribe to the events they care about. There is no base class with methods nobody calls.
 
 **No mixed naming conventions.** `snake_case` for everything. If you find yourself typing `onFlightStart` or `GetOrbitalStateVectorsAtUT` you are in the wrong headspace.
+
+**American english is preferred.** *meter* over *metre*, *centered* over *centred*, and so on.
+
+**All values in metric.** Conversions should not need any value other than a power of 10. Non-SI metric values are fine.
 
 **No `out` parameters.** This is Rust. Return `Option<T>` or `Result<T, E>`. A function that can fail says so in its signature.
 
